@@ -4,12 +4,12 @@ python-dotenv
 langserve
 google-generativeai
 streamlit
-langchain-google-genai 
+langchain-google-genai
 uvicorn
 fastapi
 sse-starlette
 bs4
 pypdf
+sentence-transformers
 faiss-cpu
 chromadb
-sentence-transformers
