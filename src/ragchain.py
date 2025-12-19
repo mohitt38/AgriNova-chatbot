@@ -36,6 +36,11 @@ def build_rag_chain():
     # Text streaming
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3, streaming=True)
 
-    # Input variables must match template placeholders
-    prompt = PromptTemplate(input_variables=["context", "question"], template=template)
-    return LLMChain(llm, chain_type="stuff", prompt=prompt)
+   def rag_chain(context: str, question: str):
+        formatted_prompt = prompt.format(
+            context=context,
+            question=question
+        )
+        return llm.invoke(formatted_prompt)
+
+    return rag_chain
