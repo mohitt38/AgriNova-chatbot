@@ -13,4 +13,3 @@ pypdf
 faiss-cpu
 chromadb
 sentence-transformers
-pdfloaders
