@@ -13,7 +13,7 @@ def ask_crop_expert_streaming(question, docs):
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
         temperature=0.3,
-        streaming=True
+       
     )
 
     prompt = PromptTemplate(
