@@ -1,6 +1,7 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain_core.chains import LLMChain
+
 
 
 def build_rag_chain():
