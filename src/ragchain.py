@@ -36,11 +36,11 @@ def build_rag_chain():
     # Text streaming
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3, streaming=True)
 
-   def rag_chain(context: str, question: str):
-        formatted_prompt = prompt.format(
-            context=context,
-            question=question
-        )
-        return llm.invoke(formatted_prompt)
+def rag_chain(context: str, question: str):
+     formatted_prompt = prompt.format(
+        context=context,
+        question=question
+    )
+return llm.invoke(formatted_prompt)
 
     return rag_chain
