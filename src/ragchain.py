@@ -1,6 +1,7 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
-from langchain.chains.question_answering import load_qa_chain
+from langchain.chains import LLMChain
+
 
 def build_rag_chain():
     template = """
@@ -36,4 +37,4 @@ def build_rag_chain():
 
     # Input variables must match template placeholders
     prompt = PromptTemplate(input_variables=["context", "question"], template=template)
-    return load_qa_chain(llm, chain_type="stuff", prompt=prompt)
+    return LLMChain(llm, chain_type="stuff", prompt=prompt)
