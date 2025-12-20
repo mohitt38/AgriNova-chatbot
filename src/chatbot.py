@@ -28,6 +28,7 @@ def ask_crop_expert_streaming(question, docs):
 def ask_crop_expert(question, vectorstore, k=3, stream=False):
     docs = vectorstore.similarity_search(question, k=k)
 
+    # -------- NON-STREAMING (RETURNS STRING) --------
     if not stream:
         if docs:
             qa_chain = build_rag_chain()
@@ -38,16 +39,19 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
                 }
             )
 
+            # Works for both AIMessage and str
             if hasattr(result, "content"):
                 return result.content
             return str(result)
 
+        # Fallback to Gemini
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             temperature=0.3
         )
         return llm.predict(question)
 
+    # -------- STREAMING (GENERATOR) --------
     if docs:
         return ask_crop_expert_streaming(question, docs)
 
@@ -56,4 +60,3 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
         temperature=0.3
     )
     return llm.stream(question)
-
