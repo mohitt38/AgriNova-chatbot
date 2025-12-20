@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-=======
 from src.ragchain import build_rag_chain
->>>>>>> 709e300 (updated)
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from src.ragchain import build_rag_chain
 
 
-<<<<<<< HEAD
-=======
-
-# ------------------------------
-# Streaming helper
->>>>>>> 709e300 (updated)
 def ask_crop_expert_streaming(question, docs):
     """
     Streaming response generator (Gemini)
@@ -32,7 +23,7 @@ def ask_crop_expert_streaming(question, docs):
             "Question:\n{question}\n\n"
             "Answer:"
         )
-<<<<<<< HEAD
+
     ).format(context=context, question=question)
 
     for chunk in llm.stream(prompt):
@@ -43,7 +34,7 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
     """
     Main chatbot function (SAFE)
     """
-=======
+
     )
 
     prompt = prompt_template.format(
@@ -55,10 +46,9 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
         yield chunk  # Gemini already streams strings
 
 
-# ------------------------------
 # Main chatbot function 
 def ask_crop_expert(question, vectorstore, k=3, stream=False):
->>>>>>> 709e300 (updated)
+
     docs = vectorstore.similarity_search(question, k=k)
 
     if not docs:
@@ -73,7 +63,6 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
         return ask_crop_expert_streaming(question, docs)
 
     # Non-streaming RAG
-<<<<<<< HEAD
     rag_chain = build_rag_chain()
     response = rag_chain(
         context=context_text,
@@ -81,7 +70,7 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
     )
 
     return response.content
-=======
+
     qa_chain = build_rag_chain()
     response = qa_chain(
         {"input_documents": docs, "question": question},
@@ -89,4 +78,3 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
     )
 
     return response["output_text"]
->>>>>>> 709e300 (updated)
