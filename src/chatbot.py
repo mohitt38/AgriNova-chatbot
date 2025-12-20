@@ -24,34 +24,27 @@ def ask_crop_expert_streaming(question, docs):
     for chunk in llm.stream(prompt):
         yield chunk
 
-
 def ask_crop_expert(question, vectorstore, k=3, stream=False):
     docs = vectorstore.similarity_search(question, k=k)
 
-    # -------- NON-STREAMING (RETURNS STRING) --------
+    # -------- NON-STREAMING --------
     if not stream:
         if docs:
             qa_chain = build_rag_chain()
-            result = qa_chain(
-                {
-                    "context": "\n".join([doc.page_content for doc in docs]),
-                    "question": question
-                }
-            )
+            context_text = "\n".join([doc.page_content for doc in docs])
+            result = qa_chain(context_text, question)
 
-            # Works for both AIMessage and str
             if hasattr(result, "content"):
                 return result.content
             return str(result)
 
-        # Fallback to Gemini
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             temperature=0.3
         )
         return llm.predict(question)
 
-    # -------- STREAMING (GENERATOR) --------
+    # -------- STREAMING --------
     if docs:
         return ask_crop_expert_streaming(question, docs)
 
