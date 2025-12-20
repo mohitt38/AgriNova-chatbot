@@ -4,6 +4,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from src.config import CHROMA_DB_DIR, EMBEDDEDING_MODEL_NAME
 
+# Ensure DB directory exists
 os.makedirs(CHROMA_DB_DIR, exist_ok=True)
 
 @st.cache_resource
@@ -13,6 +14,9 @@ def get_embeddings():
     )
 
 def is_db_built():
+    """
+    Reliable check: Chroma creates this file only after successful build
+    """
     return os.path.exists(os.path.join(CHROMA_DB_DIR, "chroma.sqlite3"))
 
 def build_vectorstore(chunks):
