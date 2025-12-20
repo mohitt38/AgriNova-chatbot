@@ -1,15 +1,28 @@
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import os
+import streamlit as st
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-EMBEDDEDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 from src.config import CHROMA_DB_DIR, EMBEDDEDING_MODEL_NAME
 
+# Ensure directory exists (VERY IMPORTANT)
+os.makedirs(CHROMA_DB_DIR, exist_ok=True)
+
+@st.cache_resource
+def get_embeddings():
+    return HuggingFaceEmbeddings(
+        model_name=EMBEDDEDING_MODEL_NAME
+    )
+
+@st.cache_resource
+def load_vectorstore():
+    embeddings = get_embeddings()
+    return Chroma(
+        persist_directory=CHROMA_DB_DIR,
+        embedding_function=embeddings
+    )
+
 def build_vectorstore(chunks):
-    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDEDING_MODEL_NAME)
+    embeddings = get_embeddings()
     vectorstore = Chroma.from_texts(
         texts=chunks,
         embedding=embeddings,
@@ -17,10 +30,3 @@ def build_vectorstore(chunks):
     )
     vectorstore.persist()
     return vectorstore
-
-def load_vectorstore():
-    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDEDING_MODEL_NAME)
-    return Chroma(
-        persist_directory=CHROMA_DB_DIR,
-        embedding_function=embeddings
-    )
