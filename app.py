@@ -31,7 +31,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-# SHOW CHAT HISTORY (USE chat_message ONLY)
+#SHOW CHAT HISTORY
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).markdown(msg["content"])
 
@@ -42,24 +42,24 @@ user_input = st.chat_input("🌾 Ask in English / Hindi / Punjabi")
 if user_input:
     user_input = clean_text(user_input)
 
-    # SAVE & SHOW USER MESSAGE
+    #  SAVE & SHOW USER MESSAGE
     st.session_state.messages.append(
         {"role": "user", "content": user_input}
     )
     st.chat_message("user").markdown(user_input)
 
-    # STREAM BOT RESPONSE
+    # NON-STREAMING BOT RESPONSE (STABLE)
     response_container = st.chat_message("assistant")
-    full_response = ""
 
-   response = ask_crop_expert(
-    user_input,
-    vectorstore=vectorstore,
-    stream=False
-)
+    response = ask_crop_expert(
+        user_input,
+        vectorstore=vectorstore,
+        stream=False
+    )
 
-response_container.markdown(response)
+    response_container.markdown(response)
 
-st.session_state.messages.append(
-    {"role": "assistant", "content": response}
-)
+    # SAVE BOT RESPONSE
+    st.session_state.messages.append(
+        {"role": "assistant", "content": response}
+    )
