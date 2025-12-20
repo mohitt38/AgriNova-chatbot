@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 import os
 import streamlit as st
+=======
+>>>>>>> 709e300 (updated)
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from src.config import CHROMA_DB_DIR, EMBEDDEDING_MODEL_NAME
 
+<<<<<<< HEAD
 # Ensure DB directory exists
 os.makedirs(CHROMA_DB_DIR, exist_ok=True)
 
@@ -25,14 +29,24 @@ def build_vectorstore(chunks):
         texts=chunks,
         embedding=embeddings,
         persist_directory=CHROMA_DB_DIR
+=======
+# DO NOT use streamlit here
+
+def get_embeddings():
+    return HuggingFaceEmbeddings(
+        model_name=EMBEDDEDING_MODEL_NAME,
+        model_kwargs={"device": "cpu"},
+        encode_kwargs={"normalize_embeddings": True}
+>>>>>>> 709e300 (updated)
     )
-    vectorstore.persist()
-    return vectorstore
 
 @st.cache_resource
 def load_vectorstore():
+<<<<<<< HEAD
     embeddings = get_embeddings()
+=======
+>>>>>>> 709e300 (updated)
     return Chroma(
         persist_directory=CHROMA_DB_DIR,
-        embedding_function=embeddings
+        embedding_function=get_embeddings()
     )
