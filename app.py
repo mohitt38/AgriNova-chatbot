@@ -52,16 +52,14 @@ if user_input:
     response_container = st.chat_message("assistant")
     full_response = ""
 
-    for token in ask_crop_expert(
-        user_input,
-        vectorstore=vectorstore,
-        stream=True
-    ):
-        text = token.content if hasattr(token, "content") else str(token)
-        full_response += text
-        response_container.markdown(full_response)
+   response = ask_crop_expert(
+    user_input,
+    vectorstore=vectorstore,
+    stream=False
+)
 
-    # SAVE BOT RESPONSE
-    st.session_state.messages.append(
-        {"role": "assistant", "content": full_response}
-    )
+response_container.markdown(response)
+
+st.session_state.messages.append(
+    {"role": "assistant", "content": response}
+)
