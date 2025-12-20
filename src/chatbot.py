@@ -28,15 +28,19 @@ def ask_crop_expert_streaming(question, docs):
 def ask_crop_expert(question, vectorstore, k=3, stream=False):
     docs = vectorstore.similarity_search(question, k=k)
 
-    # NON-STREAMING PATH (RETURNS STRING)
     if not stream:
         if docs:
             qa_chain = build_rag_chain()
             result = qa_chain(
-                {"input_documents": docs, "question": question},
-                return_only_outputs=True
+                {
+                    "context": "\n".join([doc.page_content for doc in docs]),
+                    "question": question
+                }
             )
-            return result["output_text"]
+
+            if hasattr(result, "content"):
+                return result.content
+            return str(result)
 
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
@@ -44,7 +48,6 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
         )
         return llm.predict(question)
 
-    # STREAMING PATH (RETURNS GENERATOR)
     if docs:
         return ask_crop_expert_streaming(question, docs)
 
@@ -53,3 +56,4 @@ def ask_crop_expert(question, vectorstore, k=3, stream=False):
         temperature=0.3
     )
     return llm.stream(question)
+
