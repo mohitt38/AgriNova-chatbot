@@ -1,19 +1,17 @@
-from src.embed_store import load_vectorstore
-from src.ragchain import build_rag_chain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
+from src.ragchain import build_rag_chain
 
 
 def ask_crop_expert_streaming(question, docs):
     """
-    Streaming response generator
+    Streaming response generator (Gemini)
     """
     context = "\n".join([doc.page_content for doc in docs])
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
         temperature=0.3,
-       
     )
 
     prompt = PromptTemplate(
@@ -26,19 +24,20 @@ def ask_crop_expert_streaming(question, docs):
         )
     ).format(context=context, question=question)
 
-    # Gemini streaming
     for chunk in llm.stream(prompt):
         yield chunk
 
 
-def ask_crop_expert(question, k=3, stream=False):
+def ask_crop_expert(question, vectorstore, k=3, stream=False):
     """
-    Main chatbot function
+    Main chatbot function (SAFE)
     """
-    vectorstore = load_vectorstore()
     docs = vectorstore.similarity_search(question, k=k)
 
     if not docs:
+        if stream:
+            yield "No relevant information found in the knowledge base."
+            return
         return "No relevant information found in the knowledge base."
 
     context_text = "\n".join([doc.page_content for doc in docs])
