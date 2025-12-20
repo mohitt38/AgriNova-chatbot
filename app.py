@@ -18,7 +18,7 @@ st.title("🌱 AgriNova – Crop Expert Chatbot")
 st.write("💬 Ask any crop-related question and get expert advice!")
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner=True)
 def get_vectorstore():
     return load_vectorstore()
 
@@ -26,24 +26,30 @@ def get_vectorstore():
 vectorstore = get_vectorstore()
 
 
+# INIT CHAT HISTORY
 if "messages" not in st.session_state:
-    st.session_state["messages"] = []
+    st.session_state.messages = []
 
 
-for msg in st.session_state["messages"]:
-    if msg["role"] == "user":
-        st.markdown(f"**You:** {msg['content']}")
-    else:
-        st.markdown(f"🤖 **AgriNova:** {msg['content']}")
+# SHOW CHAT HISTORY (USE chat_message ONLY)
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).markdown(msg["content"])
 
 
+# INPUT
 user_input = st.chat_input("🌾 Ask in English / Hindi / Punjabi")
 
 if user_input:
-    # SHOW USER MESSAGE IMMEDIATELY
+    user_input = clean_text(user_input)
+
+    # SAVE & SHOW USER MESSAGE
+    st.session_state.messages.append(
+        {"role": "user", "content": user_input}
+    )
     st.chat_message("user").markdown(user_input)
 
-    response_placeholder = st.chat_message("assistant")
+    # STREAM BOT RESPONSE
+    response_container = st.chat_message("assistant")
     full_response = ""
 
     for token in ask_crop_expert(
@@ -51,10 +57,11 @@ if user_input:
         vectorstore=vectorstore,
         stream=True
     ):
-        if hasattr(token, "content"):
-            full_response += token.content
-        else:
-            full_response += str(token)
+        text = token.content if hasattr(token, "content") else str(token)
+        full_response += text
+        response_container.markdown(full_response)
 
-        response_placeholder.markdown(full_response)
-
+    # SAVE BOT RESPONSE
+    st.session_state.messages.append(
+        {"role": "assistant", "content": full_response}
+    )
