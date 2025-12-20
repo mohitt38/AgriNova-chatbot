@@ -25,30 +25,33 @@ def ask_crop_expert_streaming(question, docs):
         yield chunk
 
 
+=
 def ask_crop_expert(question, vectorstore, k=3, stream=False):
     docs = vectorstore.similarity_search(question, k=k)
 
-    # 🔁 FALLBACK — STILL STREAMING
-    if not docs:
+    # NON-STREAMING (ALWAYS RETURNS STRING)
+    if not stream:
+        if docs:
+            qa_chain = build_rag_chain()
+            response = qa_chain(
+                {"input_documents": docs, "question": question},
+                return_only_outputs=True,
+            )
+            return response["output_text"]
+
+        # Fallback to Gemini
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             temperature=0.3,
-            streaming=stream,
         )
+        return llm.predict(question)
 
-        if stream:
-            for chunk in llm.stream(question):
-                yield chunk
-            return
-        else:
-            return llm.predict(question)
-
-    if stream:
+    # STREAMING PATH (GENERATOR)
+    if docs:
         return ask_crop_expert_streaming(question, docs)
 
-    qa_chain = build_rag_chain()
-    response = qa_chain(
-        {"input_documents": docs, "question": question},
-        return_only_outputs=True,
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        temperature=0.3,
     )
-    return response["output_text"]
+    return llm.stream(question)
