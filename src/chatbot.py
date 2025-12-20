@@ -8,7 +8,7 @@ def ask_crop_expert_streaming(question, docs):
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
-        temperature=0.3,
+        temperature=0.3
     )
 
     prompt = PromptTemplate(
@@ -18,40 +18,38 @@ def ask_crop_expert_streaming(question, docs):
             "Context:\n{context}\n\n"
             "Question:\n{question}\n\n"
             "Answer:"
-        ),
+        )
     ).format(context=context, question=question)
 
     for chunk in llm.stream(prompt):
         yield chunk
 
 
-=
 def ask_crop_expert(question, vectorstore, k=3, stream=False):
     docs = vectorstore.similarity_search(question, k=k)
 
-    # NON-STREAMING (ALWAYS RETURNS STRING)
+    # NON-STREAMING PATH (RETURNS STRING)
     if not stream:
         if docs:
             qa_chain = build_rag_chain()
-            response = qa_chain(
+            result = qa_chain(
                 {"input_documents": docs, "question": question},
-                return_only_outputs=True,
+                return_only_outputs=True
             )
-            return response["output_text"]
+            return result["output_text"]
 
-        # Fallback to Gemini
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
-            temperature=0.3,
+            temperature=0.3
         )
         return llm.predict(question)
 
-    # STREAMING PATH (GENERATOR)
+    # STREAMING PATH (RETURNS GENERATOR)
     if docs:
         return ask_crop_expert_streaming(question, docs)
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
-        temperature=0.3,
+        temperature=0.3
     )
     return llm.stream(question)
