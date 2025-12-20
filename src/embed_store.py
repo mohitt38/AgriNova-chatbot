@@ -1,43 +1,26 @@
-import os
-import streamlit as st
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
+from chromadb.config import Settings
+
 from src.config import CHROMA_DB_DIR, EMBEDDEDING_MODEL_NAME
 
-# Ensure DB directory exists
-os.makedirs(CHROMA_DB_DIR, exist_ok=True)
-
-@st.cache_resource
-def get_embeddings():
-    return HuggingFaceEmbeddings(
-        model_name=EMBEDDEDING_MODEL_NAME
-    )
-
-def is_db_built():
-    """
-    Reliable check: Chroma creates this file only after successful build
-    """
-    return os.path.exists(os.path.join(CHROMA_DB_DIR, "chroma.sqlite3"))
-
-def build_vectorstore(chunks):
-    embeddings = get_embeddings()
-    vectorstore = Chroma.from_texts(
-        texts=chunks,
-        embedding=embeddings,
-        persist_directory=CHROMA_DB_DIR
 
 def get_embeddings():
     return HuggingFaceEmbeddings(
         model_name=EMBEDDEDING_MODEL_NAME,
         model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True}
+        encode_kwargs={"normalize_embeddings": True},
     )
 
-@st.cache_resource
-def load_vectorstore():
 
-    embeddings = get_embeddings()
+def load_vectorstore():
     return Chroma(
+        collection_name="agrinova_collection",
         persist_directory=CHROMA_DB_DIR,
-        embedding_function=get_embeddings()
+        embedding_function=get_embeddings(),
+        client_settings=Settings(
+            anonymized_telemetry=False,
+            allow_reset=True,
+            is_persistent=True,
+        ),
     )
