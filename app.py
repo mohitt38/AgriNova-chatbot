@@ -4,23 +4,15 @@ import unicodedata
 from src.embed_store import load_vectorstore
 from src.chatbot import ask_crop_expert
 
-# ------------------------------
-# Unicode normalization
-# ------------------------------
 def clean_text(text: str) -> str:
     return unicodedata.normalize("NFKC", text).strip()
 
-# ------------------------------
-# Page config
-# ------------------------------
+
 st.set_page_config("AGRIBOT - Crop Expert Chatbot", layout="wide")
 st.title("🌱 AgriNova - Crop Expert Chatbot")
 st.write("💬 Ask any crop-related question and get expert advice!")
 
-# ------------------------------
-# LOAD VECTORSTORE (READ-ONLY)
-# ------------------------------
-# ⚠️ NO BUILD LOGIC HERE
+
 vectorstore = load_vectorstore()
 
 # ------------------------------
@@ -38,9 +30,6 @@ for msg in st.session_state["messages"]:
     else:
         st.markdown(f"🤖 **AgriNova:** {msg['content']}")
 
-# ------------------------------
-# Input box
-# ------------------------------
 user_input = st.chat_input(
     "🌾 INPUT THE QUERY (English / Hindi / Punjabi)"
 )
